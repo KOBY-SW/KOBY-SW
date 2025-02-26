@@ -53,6 +53,7 @@
     "chats-simsimi": "*",
     "chart.js": "^4.4.2",
     "cheerio": "1.0.0-rc.12",
+"crypto":"*";
         
 
 "play-dl" : "*" ,
