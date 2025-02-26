@@ -36,7 +36,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         await conn.sendMessage(m.chat, {
             audio: audioBuffer,
             mimetype: "audio/mpeg",
-            ptt: false// Sends as a voice note
+            ptt: false // Sends as a voice note
         }, { quoted: m });
     }
 };
