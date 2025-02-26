@@ -6,68 +6,30 @@ import moment from 'moment-timezone';
 
 global.botnumber = ""
 global.confirmCode = ""
-global.authFile = `MysticSession`;
+global.authFile = `KOBYsession`;
 
 // Cambiar a true si el Bot responde a sus comandos con otros comandos.
 // Cambiar a false para usar el Bot desde el mismo numero del Bot.
 // Error de m.isBaileys marcado como false fix temporal
 global.isBaileysFail = false
 
-global.defaultLenguaje = 'es';
+global.defaultLenguaje = 'ar';
 
-global.owner = [
-  ['5219992095479', '👑 Mystic - Creador 👑', true],
-  ['51940617554', '💫 Mystic - Collaborator 2 💫', true],
-  ['51996089079', '💫 Mystic - Collaborator 3 💫', true],
-  ['5218442286089', '💫 Mystic - Collaborator 4 💫', true],
-  ['50246028932', '💫 Mystic - Collaborator 5 💫', true],
-  ['5212412377467', '💫 Mystic - Collaborator 6 💫', true],
-  ['5215517489568', '💫 Mystic - Rey Endymion 💫', false],
-  ['59895555511', '💫 Mystic - Collaborator 8 💫', true],
-  ['573012482597', '💫 Mystic - Alex-X', true],
-  ['59175655964', '💫 Mystic - By Alba070503 💫', true],
-  ['5493794297363', '💫 Mystic - GabrielVz', true], 
-  ['393518398856', '💫 Mystic - Tester Fabri115💫', true],
-  ['212781160203', '💫 Mystic - Saad 💫', true], 
-  ['5217778573223', '💫 Mystic - Sarethh 💫', true],
-  ['595972157130'],
-  ['593968585283'],
-  ['5492266466080'],
-  ['5218442114446'],
-  ['59894808483'],
-  ['593980586516'], 
-  ['595975740803'],  
-  ['5492266613038'],
-  ['50497150165'],
-  ['51906662557'],
-  ['573183650526'], 
-  ['5217441298510'], 
-  ['5217294888993'],
-  ['595992611272'],
-  ['5219992843892'],
-  ['5493795319022'],
-  ['573147616444'], 
-  ['5219991402134'],
-  ['5219996125657'],
-  ['5492215034412'],
-  ['584125778026'],
-  ['5218444937407'],
-  ['5218713339906']
-];
+global.owner = ['212697516526'];
 
 global.suittag = ['5219993404349'];
 global.prems = ['51995386439'];
 
 // API
-global.BASE_API_DELIRIUS = "https://delirius-apiofc.vercel.app";
+global.BASE_API_DELIRIUS = "https://deliriusapi-official.vercel.app";
 
 global.packname = 'Sticker';
-global.author = 'The Mystic - Bot';
-global.wm = 'The Mystic - Bot';
-global.titulowm = 'The Mystic - Bot';
-global.titulowm2 = `The Mystic - Bot`
-global.igfg = 'The Mystic - Bot';
-global.wait = '*_[ ⏳ ] Cargando..._*';
+global.author = '🩶KOBY-BOT🩵';
+global.wm = '🩶KOBY-BOT🩵';
+global.titulowm = '🩶KOBY-BOT🩵';
+global.titulowm2 = `🩶KOBY-BOT🩵`
+global.igfg = '🩶KOBY-BOT🩵';
+global.wait = '> *_جاري التحميل●●●○○ 🌤 WAIT🌼_*';
 
 /*global.imagen1 = fs.createReadStream('./src/assets/images/menu/languages/es/menu.png');
 global.imagen2 = fs.createReadStream('./src/assets/images/menu/languages/pt/menu.png');

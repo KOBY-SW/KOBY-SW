@@ -155,7 +155,7 @@ const connectionOptions = {
     //msgRetryCounterMap,
     defaultQueryTimeoutMs: undefined,
     cachedGroupMetadata: (jid) => global.conn.chats[jid] ?? {},
-    version: [2, 3000, 1015901307],
+    version,
     //userDeviceCache: msgRetryCounterCache <=== quien fue el pendejo?????
 };
 
@@ -189,7 +189,7 @@ rl.close()
         setTimeout(async () => {
             let codigo = await conn.requestPairingCode(numeroTelefono)
             codigo = codigo?.match(/.{1,4}/g)?.join("-") || codigo
-            console.log(chalk.yellow('[ ℹ️ ] introduce el código de emparejamiento en WhatsApp.'));
+            console.log(chalk.yellow('🌼 HELLO IN MY BOT...🌤'));
             console.log(chalk.black(chalk.bgGreen(`Su código de emparejamiento: `)), chalk.black(chalk.white(codigo)))
         }, 3000)
 }}
@@ -197,7 +197,7 @@ rl.close()
 
 conn.isInit = false;
 conn.well = false;
-conn.logger.info(`[ ℹ️ ] Cargando...\n`);
+conn.logger.info(`🌼 HELLO IN MY BOT...🌤\n`);
 
 if (!opts['test']) {
   if (global.db) {
@@ -319,7 +319,7 @@ console.log(chalk.bold.red(`Archivo ${file} no borrado` + err))
 }
 
 async function connectionUpdate(update) {
-  
+
 
   const {connection, lastDisconnect, isNewLogin} = update;
   stopped = connection;
@@ -377,9 +377,9 @@ let isInit = true;
 
 let handler = await import('./handler.js');
 global.reloadHandler = async function(restatConn) {
-  
+
   try {
-   
+
     const Handler = await import(`./handler.js?update=${Date.now()}`).catch(console.error);
     if (Object.keys(Handler || {}).length) handler = Handler;
   } catch (e) {
@@ -531,7 +531,7 @@ setInterval(async () => {
   if (stopped === 'close' || !conn || !conn?.user) return;
   const _uptime = process.uptime() * 1000;
   const uptime = clockString(_uptime);
-  const bio = `• Activo: ${uptime} | TheMystic-Bot-MD`;
+  const bio = `🌼 Uptime:♻️ ${uptime}🌤`;
   await conn?.updateProfileStatus(bio).catch((_) => _);
 }, 60000);
 function clockString(ms) {
