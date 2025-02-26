@@ -24,17 +24,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     let audioBuffer = await audioRes.buffer();
     let audioSize = audioBuffer.length / (1024 * 1024);
 
-    let message = `
-🎵 *Title:* ${title}
-🔗 *Link:* [Listen Here](${url})
-⏱️ *Duration:* ${duration} minutes
-📦 *File Size:* ${audioSize.toFixed(2)} MB
-`;
-
-    await conn.reply(m.chat, message, m);
-
-    // Success status message
-    conn.reply(m.chat, 'Request successfully sent', m);
+   
 
     if (audioSize > 100) {
         await conn.sendMessage(m.chat, {
@@ -46,7 +36,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         await conn.sendMessage(m.chat, {
             audio: audioBuffer,
             mimetype: "audio/mpeg",
-            ptt: true // Sends as a voice note
+            ptt: false// Sends as a voice note
         }, { quoted: m });
     }
 };
