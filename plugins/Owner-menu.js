@@ -122,7 +122,7 @@ _© ${conn.user.name}_
 
     // إرسال الصورة مع المعلومات
     await conn.sendMessage(m.chat, { 
-      image: { url: 'https://qu.ax/hvhcP.jpg' }, 
+      image: { url: 'https://qu.ax/HzRPk.jpg' }, 
       caption: text.trim(), 
       contextInfo: { 
         externalAdReply: { 
