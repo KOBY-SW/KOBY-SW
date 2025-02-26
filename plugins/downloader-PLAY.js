@@ -1,56 +1,58 @@
-import fetch from 'node-fetch'
-import ffmpeg from 'fluent-ffmpeg'
-import fs from 'fs'
+import fetch from 'node-fetch';
 
-let handler = async (m, { conn, command, text, usedPrefix }) => {
-  if (!text) return conn.reply(m.chat, '❀ Ingresa un link de un video de youtube', m)
-  //si borras creditos eri gei 👀
-m.reply(wait)
-  try {
-    let api = await fetch(`https://api.davidcyriltech.my.id/download/ytmp3?url=${text}`)
-    let json = await api.json()
-    let { title, download_url } = json.result
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    let url = text.split(' ')[0];
 
-    // Descargar الملف الصوتي
-    const response = await fetch(download_url)
-    const buffer = await response.buffer()
+    if (!url) {
+        return conn.reply(m.chat, `Use the format: ${usedPrefix}${command} <url>`, m);
+    }
 
-    // حفظ الصوت في ملف مؤقت
-    const tempFile = `temp_${Date.now()}.mp3`
-    fs.writeFileSync(tempFile, buffer)
+    // Sending request status message
+    m.reply (wait);
 
-    // تحويل الصوت إلى 48kbps باستخدام ffmpeg
-    const outputFile = `output_${Date.now()}.mp3`
-    
-    await new Promise((resolve, reject) => {
-      ffmpeg(tempFile)
-        .audioBitrate(64) // تقليل معدل البت إلى 48kbps
-        .audioChannels(1) // تحويل الصوت إلى قناة واحدة (Mono)
-        .audioFrequency(22050) // تقليل معدل العينات إلى 22.05kHz
-        .save(outputFile) // حفظ الملف المحول
-        .on('end', resolve)
-        .on('error', reject)
-    })
+    let res = await fetch(`https://ytdownloader.nvlgroup.my.id/info?url=${url}`);
+    if (!res.ok) return conn.reply(m.chat, 'Failed to fetch video information', m);
 
-    // إرسال الملف الصوتي المحول
-    const audioBuffer = fs.readFileSync(outputFile)
-    await conn.sendMessage(m.chat, {
-      audio: audioBuffer,
-      mimetype: 'audio/mpeg',
-      fileName: `${title}.mp3`,
-      caption: `🎶 *${title}*`,
-    }, { quoted: m })
+    let info = await res.json();
+    let title = info.title;
+    let duration = info.duration || 'Unknown';
 
-    // تنظيف الملفات المؤقتة
-    fs.unlinkSync(tempFile)
-    fs.unlinkSync(outputFile)
+    let downloadUrl = `https://ytdownloader.nvlgroup.my.id/audio?url=${url}&bitrate=128`;
+    let audioRes = await fetch(downloadUrl);
+    if (!audioRes.ok) return conn.reply(m.chat, 'Failed to download audio', m);
 
-  } catch (error) {
-    console.error(error)
-    m.reply('❌ حدث خطأ أثناء تحميل الأغنية. حاول مرة أخرى.')
-  }
-}
+    let audioBuffer = await audioRes.buffer();
+    let audioSize = audioBuffer.length / (1024 * 1024);
 
-handler.command = ['ytmp3']
+    let message = `
+🎵 *Title:* ${title}
+🔗 *Link:* [Listen Here](${url})
+⏱️ *Duration:* ${duration} minutes
+📦 *File Size:* ${audioSize.toFixed(2)} MB
+`;
 
-export default handler
+    await conn.reply(m.chat, message, m);
+
+    // Success status message
+    conn.reply(m.chat, 'Request successfully sent', m);
+
+    if (audioSize > 100) {
+        await conn.sendMessage(m.chat, {
+            document: audioBuffer,
+            mimetype: 'audio/mpeg',
+            fileName: `${title}.mp3`
+        });
+    } else {
+        await conn.sendMessage(m.chat, {
+            audio: audioBuffer,
+            mimetype: "audio/mpeg",
+            ptt: true // Sends as a voice note
+        }, { quoted: m });
+    }
+};
+
+handler.help = ['ytmp3'];
+handler.command = ['ytmp3'];
+handler.tags = ['downloader'];
+
+export default handler;
