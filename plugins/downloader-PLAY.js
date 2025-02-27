@@ -49,7 +49,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 };
 
 handler.help = ['ytmp3'];
-handler.command = ['yt'];
+handler.command = ['ytmp3'];
 handler.tags = ['downloader'];
 
 export default handler;
