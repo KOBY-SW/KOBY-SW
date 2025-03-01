@@ -1,43 +1,54 @@
-import axios from "axios";
+import fetch from 'node-fetch';
 
-const handler = async (m, { conn, usedPrefix, text, command }) => {
-   if (!text) return m.reply(`.ytv link`);
+const handler = async (m, { text, conn }) => {
+  // التأكد من أن الرابط موجود
+  if (!text) {
+    return conn.reply(m.chat, 'يرجى إرسال رابط YouTube لتحميله كـ MP4.', m);
+  }
 
- const url = text.trim();
- const format = '360';
+  // رابط API لتحويل الفيديو إلى MP4
+  const apiUrl = `https://fastrestapis.fasturl.cloud/downup/ytmp4?url=${encodeURIComponent(text)}&quality=360`;
 
- m.reply(wait);
- const regex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+  try {
+    // استدعاء API باستخدام fetch
+    const response = await fetch(apiUrl, {
+      method: 'GET', // تحديد طريقة الطلب GET
+      headers: {
+        'accept': 'application/json' // تحديد نوع الاستجابة المطلوبة
+      }
+    });
 
- if (!regex.test(url)) {
- return m.reply('link yang anda berikan tidak valid, silahkan masuk kan link yang benar.');
- }
- try {
- const response = await axios.post('http://kinchan.sytes.net/ytdl/downloader', {
- url: url,
- format: format
- });
+    // التأكد من أن الاستجابة تحتوي على حالة 200 (نجاح)
+    if (!response.ok) {
+      throw new Error(`API returned error: ${response.statusText}`);
+    }
 
- const { title, downloadUrl } = response.data;
+    // تحويل الاستجابة إلى JSON
+    const data = await response.json();
 
- const videos = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
- const video = Buffer.from(videos.data, 'binary');
- 
- const caption = `*乂 YOUTUBE - VIDEO*\n` +
-                        `*العنوان:* ${title}\n`;
+    // التأكد من أن البيانات تحتوي على النتيجة المطلوبة
+    if (data.status === 200 && data.result && data.result.media) {
+      const mp4Url = data.result.media; // رابط الـ MP4
 
- await conn.sendMessage(m.chat, {
- video: video,
- caption: caption,
- mimetype: 'video/mp4'
- }, { quoted: m });
- } catch (error) {
- console.error('Error:', error);
- m.reply('Terjadi kesalahan saat mengunduh video, silahkan coba lagi.');
- }
-}
+      // تنزيل الفيديو
+      const videoResponse = await fetch(mp4Url);
+      const videoBuffer = await videoResponse.buffer();
 
-handler.help = ['ytv'];
-handler.tags = ['downloader'];
-handler.command = /^(ytv)$/i;
+      // إرسال الفيديو مباشرة
+      await conn.sendMessage(m.chat, {
+        video: videoBuffer,
+        caption: 'تم تحميل الفيديو بنجاح!',
+        mimetype: 'video/mp4'
+      });
+
+    } else {
+      conn.reply(m.chat, 'تعذر الحصول على الفيديو، تأكد من صحة الرابط المرسل أو أن الفيديو متاح على YouTube.', m);
+    }
+  } catch (error) {
+    console.error('Error:', error.message);
+    conn.reply(m.chat, `حدث خطأ أثناء معالجة الطلب: ${error.message}`, m);
+  }
+};
+
+handler.command = /^ytv$/i;
 export default handler;
