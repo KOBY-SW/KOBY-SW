@@ -1,54 +1,42 @@
 import fetch from 'node-fetch';
 
 const handler = async (m, { text, conn }) => {
-  // التأكد من أن الرابط موجود
   if (!text) {
-    return conn.reply(m.chat, 'يرجى إرسال رابط YouTube لتحميله كـ MP4.', m);
+    return conn.reply(m.chat, '*_🍁يرجى إدخال رابط فيديو يوتيوب.🍁_*', m);
   }
 
-  // رابط API لتحويل الفيديو إلى MP4
-  const apiUrl = `https://fastrestapis.fasturl.cloud/downup/ytmp4?url=${encodeURIComponent(text)}&quality=360`;
+  // API لاستخراج الفيديو
+  const videoApi = `https://mahiru-shiina.vercel.app/download/ytmp4?url=${encodeURIComponent(text)}`;
 
   try {
-    // استدعاء API باستخدام fetch
-    const response = await fetch(apiUrl, {
-      method: 'GET', // تحديد طريقة الطلب GET
-      headers: {
-        'accept': 'application/json' // تحديد نوع الاستجابة المطلوبة
-      }
-    });
+    const response = await fetch(videoApi);
+    const result = await response.json();
 
-    // التأكد من أن الاستجابة تحتوي على حالة 200 (نجاح)
-    if (!response.ok) {
-      throw new Error(`API returned error: ${response.statusText}`);
+    if (!result.data || !result.data.download) {
+      return conn.reply(m.chat, '⚠️ لم أتمكن من استخراج الفيديو. حاول مرة أخرى.', m);
     }
 
-    // تحويل الاستجابة إلى JSON
-    const data = await response.json();
+    const { title, thumbnail, author, download: videoUrl } = result.data;
 
-    // التأكد من أن البيانات تحتوي على النتيجة المطلوبة
-    if (data.status === 200 && data.result && data.result.media) {
-      const mp4Url = data.result.media; // رابط الـ MP4
+    // إرسال صورة الفيديو مع التفاصيل
+    await conn.sendMessage(m.chat, { 
+      image: { url: thumbnail }, 
+      caption: `📌 *العنوان:* ${title}\n📺 *القناة:* ${author.name}\n🔗 *رابط القناة:* ${author.url}`
+    }, { quoted: m });
 
-      // تنزيل الفيديو
-      const videoResponse = await fetch(mp4Url);
-      const videoBuffer = await videoResponse.buffer();
+    // إرسال الفيديو
+    await conn.sendMessage(m.chat, { 
+      video: { url: videoUrl }, 
+      mimetype: 'video/mp4'
+    }, { quoted: m });
 
-      // إرسال الفيديو مباشرة
-      await conn.sendMessage(m.chat, {
-        video: videoBuffer,
-        caption: 'تم تحميل الفيديو بنجاح!',
-        mimetype: 'video/mp4'
-      });
-
-    } else {
-      conn.reply(m.chat, 'تعذر الحصول على الفيديو، تأكد من صحة الرابط المرسل أو أن الفيديو متاح على YouTube.', m);
-    }
   } catch (error) {
-    console.error('Error:', error.message);
-    conn.reply(m.chat, `حدث خطأ أثناء معالجة الطلب: ${error.message}`, m);
+    console.log(`❌ خطأ في API الفيديو: ${error.message}`);
+    return conn.reply(m.chat, '⚠️ حدث خطأ أثناء جلب الفيديو.', m);
   }
 };
 
 handler.command = /^ytv$/i;
+handler.help = ["ytv"];
+handler.tags=["ytv"];
 export default handler;
