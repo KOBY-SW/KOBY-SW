@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 const handler = async (m, { text, conn }) => {
   if (!text) {
     return conn.reply(m.chat, '*_🍁يرجى إدخال رابط فيديو يوتيوب.🍁_*', m);
+m.reply (wait);
   }
 
   // API لاستخراج الفيديو
