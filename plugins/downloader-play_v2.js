@@ -49,7 +49,7 @@ let handler = async (m, { conn, args }) => {
 
 handler.help = ['play *<texto>*'];
 handler.tags = ['downloader'];
-handler.command = ['play'];
+handler.command = ['y'];
 
 export default handler;
 
