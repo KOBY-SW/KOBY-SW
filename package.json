@@ -35,7 +35,7 @@
     "@green-code/music-track-data": "^2.0.3",
     "@sefinek/google-tts-api": "*",
     
-    "@nechlophomeriaa/ytdl": "0.0.7",
+    
     "url-file-size": "^1.0.5-1",
     "@shineiichijo/marika": "^2.0.6",
     "@vitalets/google-translate-api": "^8.0.0",
@@ -60,7 +60,7 @@
     "colors": "1.4.0",
 "@huggingface/inference": "*",
 
-"download.js" :  "*",
+
 "path": "*",
 "ruhend-scraper": "*",
     "d3-node": "^3.0.0",
@@ -71,7 +71,7 @@
 "ffmpeg-static":"*",
     "fluid-spotify.js": "*",
 "puppeteer": "*",
-"undici" : "*",
+"undici" : "^6.21.1",
     "formdata-node": "^4.3.2",
     "fs": "^0.0.1-security",
     "google-it": "^1.6.3",
