@@ -25,7 +25,7 @@ var handler = async (m, {
       ago,
       url
     } = tes;
-    let teks = "\n*" + title + "*" + "\n\n*ا⏳️لوقت:* " +  timestamp + "\n*المشاهدات🩵:* " + views + "\n*مدة النشر🚀 :* " + ago + "\n*الرابط📎:* " + url + "\n";
+    let teks = "\n*" + title + "*" + "\n\n*الوقت⏳️:* " +  timestamp + "\n*المشاهدات🩵:* " + views + "\n*مدة النشر🚀 :* " + ago + "\n*الرابط📎:* " + url + "\n";
     let msg = generateWAMessageFromContent(m.chat, {
       'viewOnceMessage': {
         'message': {
