@@ -1,76 +1,80 @@
-import fetch from 'node-fetch';
+const {
+  proto,
+  generateWAMessageFromContent,
+  prepareWAMessageMedia
+} = (await import("baileys"))["default"];
 import yts from 'yt-search';
-
-let handler = async (m, { conn, args }) => {
-  if (!args[0]) return conn.reply(m.chat, '*\`Ingresa el nombre de lo que quieres buscar\`*', m);
-
-  
+var handler = async (m, {
+  conn,
+  command,
+  text,
+  usedPrefix
+}) => {
+  if (!text) {
+    throw `Contoh: ${usedPrefix + command} cupid`;
+  }
+  m.reply(wait);
   try {
-    let res = await search(args.join(" "));
-    let video = res[0];
-    let img = await (await fetch(video.image)).buffer();
-
-    let txt = `*\`【Y O U T U B E - P L A Y】\`*\n\n`;
-    txt += `• *\`Título:\`* ${video.title}\n`;
-    txt += `• *\`Duración:\`* ${secondString(video.duration.seconds)}\n`;
-    txt += `• *\`Publicado:\`* ${eYear(video.ago)}\n`;
-    txt += `• *\`Canal:\`* ${video.author.name || 'Desconocido'}\n`;
-    txt += `• *\`Url:\`* _https://youtu.be/${video.videoId}_\n\n`;
-
-    await conn.sendMessage(m.chat, {
-      image: img,
-      caption: txt,
-      footer: 'Selecciona una opción',
-      buttons: [
-        {
-          buttonId: `.ytmp3 https://youtu.be/${video.videoId}`,
-          buttonText: {
-            displayText: '*🎵 Audio*',
+    let results = await yts(text);
+    let tes = results.all[0]
+    let {
+      title,
+      thumbnail,
+      timestamp,
+      views,
+      ago,
+      url
+    } = tes;
+    let teks = "\n*" + title + "*" + "\n\n*Durasi:* " + timestamp + "\n*Views:* " + views + "\n*Upload:* " + ago + "\n*Link:* " + url + "\n";
+    let msg = generateWAMessageFromContent(m.chat, {
+      'viewOnceMessage': {
+        'message': {
+          'messageContextInfo': {
+            'deviceListMetadata': {},
+            'deviceListMetadataVersion': 0x2
           },
-        },
-        {
-          buttonId: `.ytv https://youtu.be/${video.videoId}`,
-          buttonText: {
-            displayText: '*🎥 Video*',
-          },
-        },
-      ],
-      viewOnce: true,
-      headerType: 4,
-    }, { quoted: m });
-
-    
-  } catch (e) {
-    console.error(e);
-    
-    conn.reply(m.chat, '*\`Error al buscar el video.\`*', m);
+          'interactiveMessage': proto.Message.InteractiveMessage.create({
+            'body': proto.Message.InteractiveMessage.Body.create({
+              'text': teks
+            }),
+            'footer': proto.Message.InteractiveMessage.Footer.create({
+              'text': wm
+            }),
+            'header': proto.Message.InteractiveMessage.Header.create({
+              'hasMediaAttachment': false,
+              ...(await prepareWAMessageMedia({
+                'image': {
+                  'url': thumbnail
+                }
+              }, {
+                'upload': conn.waUploadToServer
+              }))
+            }),
+            'nativeFlowMessage': proto.Message.InteractiveMessage.NativeFlowMessage.create({
+              'buttons': [{
+                'name': "quick_reply",
+                'buttonParamsJson': "{\"display_text\":\"Audio\",\"id\":\".ytmp3 " + url + "\"}"
+              }, {
+                'name': "quick_reply",
+                'buttonParamsJson': "{\"display_text\":\"Video\",\"id\":\".ya "  + url + "\"}"
+              }]
+            })
+          })
+        }
+      }
+    }, {
+      'quoted': m
+    });
+    return await conn.relayMessage(m.chat, msg.message, {});
+  } catch (err) {
+    conn.sendFile(m.chat, eror, "anu.mp3", null, m, true, {
+      'type': "audioMessage",
+      'ptt': true
+    });
   }
 };
-
-handler.help = ['play *<texto>*'];
-handler.tags = ['downloader'];
-handler.command = ['y'];
+handler.help = ["play"];
+handler.tags = ["downloader"];
+handler.command = /^(py)$/i;
 
 export default handler;
-
-async function search(query, options = {}) {
-  let search = await yts.search({ query, hl: "es", gl: "ES", ...options });
-  return search.videos;
-}
-
-function secondString(seconds) {
-  seconds = Number(seconds);
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
-}
-
-function eYear(txt) {
-  if (txt.includes('year')) return txt.replace('year', 'año').replace('years', 'años');
-  if (txt.includes('month')) return txt.replace('month', 'mes').replace('months', 'meses');
-  if (txt.includes('day')) return txt.replace('day', 'día').replace('days', 'días');
-  if (txt.includes('hour')) return txt.replace('hour', 'hora').replace('hours', 'horas');
-  if (txt.includes('minute')) return txt.replace('minute', 'minuto').replace('minutes', 'minutos');
-  return txt;
-}
