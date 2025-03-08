@@ -1,7 +1,11 @@
 import { ytmp4 } from 'ruhend-scraper';
 
 const handler = async (m, { conn, args }) => {
-  const url = args[0]; // Assuming the user provides the URL as the first argument
+  const url = args[0]; 
+m.reply(wait);
+
+
+// Assuming the user provides the URL as the first argument
   if (!url) return m.reply('يرجى إرسال رابط الفيديو من يوتيوب.');
 
   try {
