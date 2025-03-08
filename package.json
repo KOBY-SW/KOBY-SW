@@ -41,7 +41,7 @@
     "@vitalets/google-translate-api": "^8.0.0",
 "whatsapp-web.js" :"*",
    
-                           "baileys": "github:ds6/bails",
+                           "baileys": "github:KOBY-SW/KOBY",
     "acrcloud": "^1.4.0",
     "aptoide-scraper": "github:DIEGO-OFC/dv-aptoide-scraper",
     "awesome-phonenumber": "^2.68.0",
