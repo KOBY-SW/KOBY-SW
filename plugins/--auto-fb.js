@@ -1,113 +1,79 @@
+import fetch from 'node-fetch';
 import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
-import fetch from 'node-fetch';
+import ffmpegPath from 'ffmpeg-static';
 
-let handler = async (m, { conn }) => {
-    // التعبير المنظم لاكتشاف روابط فيسبوك
-    const urlRegex = /https?:\/\/(?:www\.)?facebook\.com\/[^\s]+/i;
-    const match = m.text.match(urlRegex);
+// تحديد مسار ffmpeg
+ffmpeg.setFfmpegPath(ffmpegPath);
 
-    if (!match) {
-        return; // لا يوجد رابط فيدو من فيسبوك في الرسالة
+const handler = async (m, { conn }) => {
+  const messageText = m.text.trim(); // استخدام m.text للحصول على محتوى الرسالة
+
+  // التأكد من أن الرابط موجود
+  if (!messageText) {
+    return conn.reply(m.chat, 'يرجى إرسال رابط Facebook لتحميله.', m);
+m.reply(wait);
+  }
+
+  // رابط API لتحميل الفيديو من Facebook
+  const apiUrl = `https://jazxcode.biz.id/downloader/facebook?url=${encodeURIComponent(messageText)}`;
+
+  try {
+    // استدعاء API باستخدام fetch
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    // التأكد من أن الاستجابة تحتوي على النتيجة المطلوبة
+    if (data.status) {
+      const videoUrl = data.result.sdLink || data.result.hdLink; // الحصول على رابط الفيديو (جودة منخفضة أو عالية)
+      const title = data.result.title; // العنوان
+      const caption = data.result.caption; // التسمية التوضيحية
+      const image = data.result.image; // صورة مصغرة
+
+      // تنزيل الفيديو
+      const videoPath = `./src/tmp/facebook_${Date.now()}.mp4`;
+      const videoBuffer = await (await fetch(videoUrl)).buffer();
+      fs.writeFileSync(videoPath, videoBuffer);
+
+      // إرسال الفيديو
+      await conn.sendMessage(m.chat, { 
+        video: { url: videoUrl }, 
+        caption: `${title}\n\n${caption}`,
+        thumbnail: { url: image }
+      }, { quoted: m });
+
+      // استخراج الصوت من الفيديو باستخدام ffmpeg
+      const audioPath = videoPath.replace('.mp4', '.mp3');
+      await new Promise((resolve, reject) => {
+        ffmpeg(videoPath)
+          .output(audioPath)
+          .toFormat('mp3')
+          .on('end', resolve)
+          .on('error', reject)
+          .run();
+      });
+
+      // إرسال الصوت المستخرج
+      await conn.sendMessage(
+        m.chat,
+        { audio: fs.readFileSync(audioPath), mimetype: 'audio/mpeg', ptt: false }, // إرسال الصوت كـ PTT
+        { quoted: m }
+      );
+
+      // حذف الملفات المؤقتة
+      fs.unlinkSync(videoPath);
+      fs.unlinkSync(audioPath);
+    } else {
+      conn.reply(m.chat, 'تعذر الحصول على الرابط، تأكد من صحة الرابط المرسل.', m);
     }
-
-    const videoUrl = match[0]; // استخراج رابط الفيديو
-    await m.reply(wait);
-
-    try {
-        // استدعاء دالة التنزيل
-        const { success, title, links } = await fb(videoUrl);
-
-        if (!success || !links['Download High Quality']) {
-            throw '❌ حدث خطأ أثناء محاولة التنزيل. يرجى المحاولة لاحقًا.';
-        }
-
-        const videoLink = links['Download High Quality'];
-        const baseFilePath = `./src/tmp/${m.sender}`;
-        const inputPath = await downloadMedia(videoLink, baseFilePath, 'mp4');
-        const outputPath = inputPath.replace(/\.mp4$/, '.mp3'); // استبدال الامتداد بـ mp3
-
-        // إرسال الفيديو بجودة عالية
-        await conn.sendFile(m.chat, videoLink, '', `*${title || 'بدون عنوان'}*`, m);
-
-        // تحويل الفيديو إلى MP3
-        await convertToMp3(inputPath, outputPath);
-
-        // قراءة ملف MP3
-        const mp3Buffer = fs.readFileSync(outputPath);
-
-        // إرسال ملف MP3
-        await conn.sendMessage(
-            m.chat,
-            { audio: mp3Buffer, fileName: `output.mp3`, mimetype: 'audio/mpeg', ptt: false },
-            { quoted: m }
-        );
-
-        // تنظيف الملفات المؤقتة
-        fs.unlinkSync(inputPath);
-        fs.unlinkSync(outputPath);
-    } catch (e) {
-        console.error(e);
-        await m.reply('❌ حدث خطأ أثناء معالجة الطلب.');
-    }
+  } catch (error) {
+    console.error('Error:', error);
+    conn.reply(m.chat, 'حدث خطأ أثناء معالجة الطلب.', m);
+  }
 };
 
-handler.tags = ['downloader'];
-handler.customPrefix = /https?:\/\/(?:www\.)?facebook\.com\//i;
-handler.command = new RegExp;
+// تشغيل البوت تلقائيًا عند إرسال رابط Facebook
+handler.customPrefix = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.com)\/.+$/;
+handler.command = new RegExp(); // بدون أمر محدد
 
 export default handler;
-
-// دالة التنزيل من فيسبوك
-async function fb(vid_url) {
-    try {
-        const data = {
-            url: vid_url,
-        };
-        const searchParams = new URLSearchParams();
-        searchParams.append('url', data.url);
-        const response = await fetch('https://facebook-video-downloader.fly.dev/app/main.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: searchParams.toString(),
-        });
-        const responseData = await response.json();
-        return responseData;
-    } catch (e) {
-        return {
-            success: false,
-            error: e.message,
-        };
-    }
-}
-
-// وظائف مساعدة
-async function downloadMedia(url, basePath, extension) {
-    const response = await fetch(url);
-    const buffer = await response.buffer();
-    const filePath = await getUniqueFileName(basePath, extension);
-    fs.writeFileSync(filePath, buffer);
-    return filePath;
-}
-
-async function getUniqueFileName(basePath, extension) {
-    let fileName = `${basePath}.${extension}`;
-    let counter = 1;
-    while (fs.existsSync(fileName)) {
-        fileName = `${basePath}_${counter}.${extension}`;
-        counter++;
-    }
-    return fileName;
-}
-
-function convertToMp3(inputPath, outputPath) {
-    return new Promise((resolve, reject) => {
-        ffmpeg(inputPath)
-            .toFormat('mp3')
-            .on('end', resolve)
-            .on('error', reject)
-            .save(outputPath);
-    });
-}
