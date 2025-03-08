@@ -52,8 +52,8 @@ const handler = async (m, { conn, text }) => {
     }
 };
 
-handler.help = ['play'].map(v => v + ' <بحث>');
+handler.help = ['py'].map(v => v + ' <بحث>');
 handler.tags = ['downloader'];
-handler.command = /^play$/i;
+handler.command = /^py$/i;
 
 export default handler;
