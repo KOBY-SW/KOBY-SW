@@ -11,7 +11,7 @@ var handler = async (m, {
   usedPrefix
 }) => {
   if (!text) {
-    throw `Contoh: ${usedPrefix + command} cupid`;
+    throw `أكتب العنوان أو الرابط `;
   }
   m.reply(wait);
   try {
@@ -25,7 +25,7 @@ var handler = async (m, {
       ago,
       url
     } = tes;
-    let teks = "\n*" + title + "*" + "\n\n*Durasi:* " + timestamp + "\n*Views:* " + views + "\n*Upload:* " + ago + "\n*Link:* " + url + "\n";
+    let teks = "\n*" + العنوان🍃 + "*" + "\n\n*ا⏳️لوقت:* " +  timestamp + "\n*المشاهدات🩵:* " + views + "\n*مدة النشر🚀 :* " + ago + "\n*الرابط📎:* " + url + "\n";
     let msg = generateWAMessageFromContent(m.chat, {
       'viewOnceMessage': {
         'message': {
@@ -53,10 +53,10 @@ var handler = async (m, {
             'nativeFlowMessage': proto.Message.InteractiveMessage.NativeFlowMessage.create({
               'buttons': [{
                 'name': "quick_reply",
-                'buttonParamsJson': "{\"display_text\":\"Audio\",\"id\":\".ytmp3 " + url + "\"}"
+                'buttonParamsJson': "{\"display_text\":\"🍀Audio\",\"id\":\".ytmp3 " + url + "\"}"
               }, {
                 'name': "quick_reply",
-                'buttonParamsJson': "{\"display_text\":\"Video\",\"id\":\".ya "  + url + "\"}"
+                'buttonParamsJson': "{\"display_text\":\"🍁Video\",\"id\":\".ya " + url + "\"}"
               }]
             })
           })
@@ -75,6 +75,6 @@ var handler = async (m, {
 };
 handler.help = ["play"];
 handler.tags = ["downloader"];
-handler.command = /^(py)$/i;
+handler.command = /^(play)$/i;
 
 export default handler;
