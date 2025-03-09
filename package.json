@@ -59,7 +59,7 @@
 
     "colors": "1.4.0",
 "@huggingface/inference": "*",
-"@vioo/apis@":"^1.4.2",
+"@vioo/apis":"^1.4.2",
 
 
 "path": "*",
